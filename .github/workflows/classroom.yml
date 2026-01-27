@@ -1,35 +1,5 @@
-          echo "exit_code=$?" >> "$GITHUB_OUTPUT"
-          exit 0
-
-      - name: Compute score
-        id: score
-        shell: bash
-        run: |
-          set -euo pipefail
-
-          SCORE=0
-
-          if [ "${{ steps.detect.outputs.has_pom }}" = "true" ]; then
-            # Default for Maven project present but tests failing or not run.
-            SCORE=80
 name: Classroom Autograding
-            # If unit tests ran and succeeded, full credit.
-            if [ "${{ steps.unit.outputs.exit_code || '1' }}" = "0" ]; then
-              SCORE=100
-            fi
-          fi
 
-          echo "score=$SCORE" >> "$GITHUB_OUTPUT"
-          echo "Final score: $SCORE"
-
-      - name: Report grade to GitHub Classroom
-        if: always()
-        uses: classroom-resources/autograding-grading-action@v1
-        with:
-          token: ${{ secrets.GITHUB_TOKEN }}
-          test-name: maven-unit-tests
-          points: ${{ steps.score.outputs.score }}
-          max-points: 100
 on:
   push:
   pull_request:
@@ -78,8 +48,38 @@ jobs:
         if: steps.detect.outputs.has_pom == 'true'
         shell: bash
         env:
-          STUDENT_NAME: Alice
+          USER_NAME: Alice
         run: |
           set +e
           mvn -B -ntp test
+          echo "exit_code=$?" >> "$GITHUB_OUTPUT"
+          exit 0
 
+      - name: Compute score
+        id: score
+        shell: bash
+        run: |
+          set -euo pipefail
+
+          SCORE=0
+
+          if [ "${{ steps.detect.outputs.has_pom }}" = "true" ]; then
+            # Default for Maven project present but tests failing or not run.
+            SCORE=80
+            # If unit tests ran and succeeded, full credit.
+            if [ "${{ steps.unit.outputs.exit_code || '1' }}" = "0" ]; then
+              SCORE=100
+            fi
+          fi
+
+          echo "score=$SCORE" >> "$GITHUB_OUTPUT"
+          echo "Final score: $SCORE"
+
+      - name: Report grade to GitHub Classroom
+        if: always()
+        uses: classroom-resources/autograding-grading-action@v1
+        with:
+          token: ${{ secrets.GITHUB_TOKEN }}
+          test-name: maven-unit-tests
+          points: ${{ steps.score.outputs.score }}
+          max-points: 100

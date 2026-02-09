@@ -1,3 +1,4 @@
+package mcon364.las.touro.edu;
 import java.util.Optional;
 
 public class Main {
@@ -9,7 +10,7 @@ public class Main {
     }
     public static String getGreeting(String envVarName){
         Optional<String> environmentVarName= getUserName(envVarName);
-        var number=10;
+        int number=10;
         var name= "Aviva";
         switch(){
             case 1:
